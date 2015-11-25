@@ -23,7 +23,30 @@
 			<span>Design by beard.</span>
 		</footer>
 	</div>
-	<script type="text/javascript" src='lib/jquery.js'></script>
+	<script type="text/javascript">
+		var $ = function(selector) {
+			var el = document.querySelector(selector);
+			var o = {
+				val:function(content) {
+					if(typeof content === 'string')
+						el.value = content;
+					else
+						return el.value;
+				},
+				bind:function(event,callback) {
+					el.addEventListener(event,callback);
+				},
+				append:function(content) {
+					var reg = /^<(\w+)>(.*)<\/\1>/;
+					var match = reg.exec(content);
+					var li = document.createElement(match[1]);
+					li.innerText = match[2];
+					el.appendChild(li);
+				}
+			};
+			return o;
+		};
+	</script>
 	<script type="text/javascript">
 		var newTodo = $('#newTodo');
 		var ul = $('ul.todos');
