@@ -23,6 +23,17 @@
 			<span>Design by beard.</span>
 		</footer>
 	</div>
+	<script type="text/javascript" src='lib/jquery.js'></script>
+	<script type="text/javascript">
+		var newTodo = $('#newTodo');
+		var ul = $('ul.todos');
+		newTodo.bind('keypress',function(e) {
+			if(e.charCode !== 13)
+				return;
+			ul.append("<li>"+ newTodo.val() +"</li>")
+			newTodo.val('');	
+		});
+	</script>
 </body>
 </html>
 
