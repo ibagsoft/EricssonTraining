@@ -195,8 +195,7 @@ $.getJSON('/todos',null,function(data){
 
 ## 小结
 目前为止，jQlite的源码如下：
-```
-<!--lang: js-->
+```javascript
 var $ = function(selector) {
 	var el = document.querySelector(selector);
 	var o = {
