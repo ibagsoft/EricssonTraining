@@ -5,25 +5,25 @@
 函数有三种定义方式：  
 
 - 匿名函数
-```
+```javascript
 var foo = function() {};
 ```
 foo只是一个指定函数地址的指针，而该函数没有名称  
 
 - 具名函数
-```
+```javascript
 function foo () {}
 ```
 具名函数除了有名称之外，还会提态变量的初始化时间。  
 
 - 函数对象
-```
+```javascript
 var foo = new Function();
 ```
 函数对象的定义方式与匿名函数一致，但是匿名函数作了优化
 
 ### jQuery的$实现
-```
+```javascript
 var $ = function(selector) {
 	return document.querySelector(selector);
 };
@@ -31,7 +31,7 @@ var $ = function(selector) {
 
 ## 对象
 javascript是一种动态的面向对象语言:
-```
+```javascript
 var o = new Object();
 o.name = 'jobs';
 o.age = 62;
@@ -43,7 +43,7 @@ o.say();
 console.log(o.name + ":" + o.age);
 ```
 但是，它更推荐字面量`{}`的写法:
-```
+```javascript
 var o = {
 	name:'jobs',
 	age:62,
@@ -53,7 +53,7 @@ var o = {
 };
 ```
 ### jQuery的对象实现
-```
+```javascript
 var $ = function(selector) {
 	var el = document.querySelector(selector);
 	var o = {
@@ -73,7 +73,7 @@ var $ = function(selector) {
 ```
 ## 回调
 JavaScript的函数实际上是一种对象，不过是函数对象，所以函数也可以作为参数传给另外一个函数：
-```
+```javascript
 var foo = function(name,arg) {
 	if(typeof arg === 'function')
 		arg();
@@ -88,7 +88,7 @@ foo('keypress',function() {
 });
 ```
 ### JQuery的bind
-```
+```javascript
 bind:function(event,callback) {
 	el.addEventListener(event,callback);
 }
@@ -97,7 +97,7 @@ bind:function(event,callback) {
 ## 小结
 到目前为止，我们接触到了对象、函数和回调的概念。
 实现的jQuery代码如下：
-```
+```javascript
 var $ = function(selector) {
 	var el = document.querySelector(selector);
 	var o = {
@@ -124,7 +124,7 @@ var $ = function(selector) {
 
 ## 再谈回调
 回调这种函数语言式的特性，能够将服务的定义延迟到使用的时候。
-```
+```javascript
 var foo = function(callback) {
 	var request = {url:'/todos'};
 	var response = {
@@ -146,7 +146,7 @@ foo(function(req,res) {
 });
 ```
 ### 回调在Nodejs中的应用
-```
+```javascript
 var http = require('http');
 var fs = require('fs');
 
@@ -175,8 +175,7 @@ http.createServer(function(req,res) {
 }).listen(9432);
 ```
 ### 回调在ajax中的应用
-```
-<!--lang: javascript-->
+```javascript
 $.getJSON = function(url,data,success) {
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function(){
