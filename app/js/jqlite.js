@@ -17,6 +17,18 @@ var $ = function(selector) {
 			var li = document.createElement(match[1]);
 			li.innerText = match[2];
 			el.appendChild(li);
+		},
+		slideDown:function(during) {
+			var style = document.defaultView.getComputedStyle(el);
+			var height = parseInt(style.height);
+			el.style.overflow = 'auto';
+			for(var i = 1;i<=height;i++){
+				(function(h) {
+					setTimeout(function() {
+						el.style.height = h + "px";
+					},h*during/height);
+				})(i);
+			}
 		}
 	};
 	return o;

@@ -230,3 +230,106 @@ $.getJSON = function(url,data,success) {
 };
 ```
 
+## 作用域
+JS的作用域由Global、Local、Closure三部分组成：
+```javascript
+var foo = function() {
+	console.log('break');
+	var a = 5,
+	b = function() {};
+	function c() {
+		console.log('break');
+		var d = a + 5;
+		return d;
+	}
+	c();
+};
+foo();
+```
+### 节省内存
+对于经常访问的global变量，最好通过参数传给local:
+```javascrpit
+var foo = function(document) {
+	//a lot of code
+	//document.querySelector(selector);
+};
+foo(document);
+```
+
+### 封装
+通过即时函数，来模仿private与public:
+```javascript
+var ericsson = ericsson || {};
+ericsson.model = {};
+
+(function(ericsson) {
+	//private
+	var a = 4,b = 5;
+	var method1 = function() {};
+	var method2 = function() {
+		return a+b;
+	};
+	//public
+	ericsson.model.sum = method2;
+})(ericsson);
+```
+也可以模仿命名空间:
+```javascript
+var ericsson = ericsson || {};
+//即时函数
+(function(ericsson) {
+	//private
+	var a = 4,b = 5;
+	var method1 = function() {};
+	var method2 = function() {
+		return a+b;
+	};
+	ericsson.model = {
+		create:method1,
+		save:method2
+	}
+})(ericsson);
+
+var ericsson = ericsson || {};
+//即时函数
+(function(ericsson) {
+	//private
+	var a = 4,b = 5;
+	var method1 = function() {};
+	var method2 = function() {
+		return a+b;
+	};
+	ericsson.view = {
+		paint:method1,
+		render:method2
+	}
+})(ericsson);
+```
+### settimeout
+使用local作用域巧妙的封装了i当时的值：
+```javascript
+var height = 10;
+for(var i = 0;i<height;i++){
+	(function(h) {
+		setTimeout(function() {
+			console.log(h);
+		},h*1000);
+	})(i);
+}
+```
+
+### jQuery的slideDown的实现
+```javascript
+slideDown:function(during) {
+	var style = document.defaultView.getComputedStyle(el);
+	var height = parseInt(style.height);
+	el.style.overflow = 'auto';
+	for(var i = 1;i<=height;i++){
+		(function(h) {
+			setTimeout(function() {
+				el.style.height = h + "px";
+			},h*during/height);
+		})(i);
+	}
+}
+```
