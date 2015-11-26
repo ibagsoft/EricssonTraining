@@ -121,3 +121,113 @@ var $ = function(selector) {
 	return o;
 };
 ```
+
+## 再谈回调
+回调这种函数语言式的特性，能够将服务的定义延迟到使用的时候。
+```
+var foo = function(callback) {
+	var request = {url:'/todos'};
+	var response = {
+		write:function(content) {
+			console.log(content);
+		},
+		end:function() {
+			console.log('done');
+		}
+	};
+	if(typeof callback === 'function')
+		callback(request,response);
+}; 
+
+foo(function(req,res) {
+	console.log(req.url);
+	res.write('404');
+	res.end();
+});
+```
+### 回调在Nodejs中的应用
+```
+var http = require('http');
+var fs = require('fs');
+
+http.createServer(function(req,res) {
+	var path = req.url.slice(1);
+	console.log(path);
+	fs.exists(path,function(exist) {
+		if(exist){
+			fs.readFile(path,'utf-8',function(err,content) {
+				res.write(content);
+				res.end();
+			});
+		}
+		else{
+			if(path === 'todos'){
+				var todos = ['This is Todo1','This is Todo2','This is Todo3'];
+				res.write(JSON.stringify(todos));
+				res.end();
+			}
+			else{
+				res.write('404');
+				res.end();
+			}
+		}
+	});
+}).listen(9432);
+```
+### 回调在ajax中的应用
+```
+$.getJSON = function(url,data,success) {
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState === 4 && xhr.status === 200){
+			success(JSON.parse(xhr.responseText));
+		}
+	};
+	xhr.open('get',url,true);
+	xhr.send(null);
+};
+$.getJSON('/todos',null,function(data){
+	for(var index in data){
+		console.log(data[index]);
+	}
+});
+```
+
+## 小结
+目前为止，jQlite的源码如下：
+```
+// js/jqlite.js
+var $ = function(selector) {
+	var el = document.querySelector(selector);
+	var o = {
+		val:function(content) {
+			if(typeof content === 'string')
+				el.value = content;
+			else
+				return el.value;
+		},
+		bind:function(event,callback) {
+			el.addEventListener(event,callback);
+		},
+		append:function(content) {
+			var reg = /^<(\w+)>(.*)<\/\1>/;
+			var match = reg.exec(content);
+			var li = document.createElement(match[1]);
+			li.innerText = match[2];
+			el.appendChild(li);
+		}
+	};
+	return o;
+};
+$.getJSON = function(url,data,success) {
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState === 4 && xhr.status === 200){
+			success(JSON.parse(xhr.responseText));
+		}
+	};
+	xhr.open('get',url,true);
+	xhr.send(null);
+};
+```
+

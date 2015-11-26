@@ -13,9 +13,7 @@
 		</header>
 		<section>
 			<ul class="todos">
-				<li>This is Todo1</li>
-				<li>This is Todo2</li>
-				<li>This is Todo3</li>
+				
 			</ul>
 			<input type="text" id="newTodo">
 		</section>
@@ -23,44 +21,10 @@
 			<span>Design by beard.</span>
 		</footer>
 	</div>
-	<script type="text/javascript">
-		var $ = function(selector) {
-			var el = document.querySelector(selector);
-			var o = {
-				val:function(content) {
-					if(typeof content === 'string')
-						el.value = content;
-					else
-						return el.value;
-				},
-				bind:function(event,callback) {
-					el.addEventListener(event,callback);
-				},
-				append:function(content) {
-					var reg = /^<(\w+)>(.*)<\/\1>/;
-					var match = reg.exec(content);
-					var li = document.createElement(match[1]);
-					li.innerText = match[2];
-					el.appendChild(li);
-				}
-			};
-			return o;
-		};
-	</script>
-	<script type="text/javascript">
-		var newTodo = $('#newTodo');
-		var ul = $('ul.todos');
-		newTodo.bind('keypress',function(e) {
-			if(e.charCode !== 13)
-				return;
-			ul.append("<li>"+ newTodo.val() +"</li>")
-			newTodo.val('');	
-		});
-	</script>
+	<script type="text/javascript" src='js/jqlite.js'></script>
+	<script type="text/javascript" src='js/todos.js'></script>
 </body>
 </html>
-
-
 
 
 
