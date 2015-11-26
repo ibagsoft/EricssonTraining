@@ -17,6 +17,14 @@ http.createServer(function(req,res) {
 				res.write(JSON.stringify(todos));
 				res.end();
 			}
+			else if(path === 'products'){
+					var products = [{subject:'Product1',content:'Describe1'},
+        {subject:'Product2',content:'Describe2'},
+        {subject:'Product3',content:'Describe3'},
+        {subject:'Product4',content:'Describe4'}];
+        res.write(JSON.stringify(products));
+        res.end();
+			}
 			else{
 				res.write('404');
 				res.end();
