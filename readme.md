@@ -176,6 +176,7 @@ http.createServer(function(req,res) {
 ```
 ### 回调在ajax中的应用
 ```
+<!--lang: javascript-->
 $.getJSON = function(url,data,success) {
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function(){
@@ -196,7 +197,7 @@ $.getJSON('/todos',null,function(data){
 ## 小结
 目前为止，jQlite的源码如下：
 ```
-// js/jqlite.js
+<!--lang: js-->
 var $ = function(selector) {
 	var el = document.querySelector(selector);
 	var o = {
