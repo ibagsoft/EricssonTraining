@@ -424,3 +424,153 @@ $.proxy = function(o,fn) {
 	};
 };
 ```
+
+## 构造器
+### JS的囧境 & 应对
+```javascript
+var o1 = {
+	name:'jobs',
+	say:function() {
+		console.log(this.name);
+	},
+	show:function() {}
+};
+
+var o2 = {
+	name:'gates',
+	say:function() {
+		console.log(this.name);
+	},
+	show:function() {}
+};
+```
+怎么消除重复呢？
+```javascript
+var init = function(name) {
+	this.name = name;
+	this.say = function() {
+		console.log(this.name);
+	};
+	this.show = function() {};
+};
+
+var o1 = {};
+init.call(o1,'jobs');
+var o2 = {};
+init.call(o2,'gates');
+```
+但是这种方法是一种内存的浪费.  
+怎么消除这种内存的浪费呢？
+```javascript
+var say = function() {
+	console.log(this.name);
+};
+var show = function() {};
+
+var init = function(name) {
+	this.name = name;
+	this.say = say;
+	this.show = show;
+};
+
+var o1 = {};
+init.call(o1,'jobs');
+var o2 = {};
+init.call(o2,'gates');
+```
+但是这种写法破坏了封装性.可以使用即时函数封装：
+```javascript
+(function() {
+	//private
+	var say = function() {
+		console.log(this.name);
+	};
+	var show = function() {};
+	var init = function(name) {
+		this.name = name;
+		this.say = say;
+		this.show = show;
+	};
+
+	//public
+	this.init = init;
+}).call(this);
+
+var o1 = {};
+this.init.call(o1,'jobs');
+var o2 = {};
+this.init.call(o2,'gates');
+```
+#### jQuery的封装
+```javascript
+(function(window) {
+	//private
+	var val = function(content) {
+		if(typeof content === 'string')
+			this.el.value = content;
+		else
+			return this.el.value;
+	};
+	var bind = function(event,callback) {
+		this.el.addEventListener(event,callback);
+	};
+	var append = function(content) {
+		var reg = /^<(\w+)>(.*)<\/\1>/;
+		var match = reg.exec(content);
+		var li = document.createElement(match[1]);
+		li.innerText = match[2];
+		this.el.appendChild(li);
+	};
+	var getStyle =function(attr) {
+		var style = document.defaultView.getComputedStyle(this.el);
+		return style[attr];
+	};
+	var slideDown = function(during) {
+		var height = parseInt(this.getStyle('height'));
+		this.el.style.overflow = 'auto';
+		var that = this;
+		for(var i = 1;i<=height;i++){
+			(function(h) {
+				setTimeout(function() {
+					that.el.style.height = h + "px";
+				},h*during/height);
+			})(i);
+		}
+	};
+	var getJSON = function(url,data,success) {
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState === 4 && xhr.status === 200){
+				success(JSON.parse(xhr.responseText));
+			}
+		};
+		xhr.open('get',url,true);
+		xhr.send(null);
+	};
+	var proxy = function(o,fn) {
+		return function() {
+			o[fn].call(o);	
+		};
+	};
+	var jQuery = function(selector) {
+		var el = document.querySelector(selector);
+		var o = {
+			el:el,
+			val:val,
+			bind:bind,
+			append:append,
+			getStyle:getStyle,
+			slideDown:slideDown
+		};
+		return o;
+	};
+	var $ = window.$ = jQuery;
+	$.getJSON = getJSON;
+	$.proxy = proxy;
+})(window);
+```
+
+
+
+
+
