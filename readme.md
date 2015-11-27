@@ -246,7 +246,7 @@ var foo = function() {
 };
 foo();
 ```
-### 节省内存
+### 节省查询的路径
 对于经常访问的global变量，最好通过参数传给local:
 ```javascrpit
 var foo = function(document) {
@@ -332,4 +332,95 @@ slideDown:function(during) {
 		})(i);
 	}
 }
+```
+
+## 函数的几种调用方式
+### 直接调用
+此时的this是window(global)  
+```javascript
+var foo = function(name) {
+	this.name = name;
+};
+foo('jobs');
+```
+
+### 通过对象调用
+此时的this是对象，也就是o
+```javascript
+var foo = function(name) {
+	this.name = name;
+};
+
+var o = {
+	setName:foo
+};
+
+o.setName('jobs');
+```
+
+#### JS的对象是集合
+```javascript
+var o = {
+	name:'jobs',
+	age:62,
+	say:function() {
+		console.log(this.name + ":" + this.age);
+	}
+};
+for(var attr in o)
+	console.log(o[attr]);
+
+o['say']();
+```
+#### jQuery里getStyle的重用
+```javascript
+getStyle:function(attr) {
+	var style = document.defaultView.getComputedStyle(el);
+	return style[attr];
+},
+slideDown:function(during) {
+	var height = parseInt(this.getStyle('height'));
+	el.style.overflow = 'auto';
+	for(var i = 1;i<=height;i++){
+		(function(h) {
+			setTimeout(function() {
+				el.style.height = h + "px";
+			},h*during/height);
+		})(i);
+	}
+}
+```
+#### 此this非彼this
+```javascript
+slideDown:function(during) {
+	var height = parseInt(this.getStyle('height'));
+	this.el.style.overflow = 'auto';
+	var that = this;
+	for(var i = 1;i<=height;i++){
+		(function(h) {
+			setTimeout(function() {
+				//此处的this指的是window，所以使用that
+				that.el.style.height = h + "px";
+			},h*during/height);
+		})(i);
+	}
+}
+```
+
+### call & apply
+```javascript
+
+foo.call({
+	mySelf:''
+},'jobs');
+
+foo.apply(o,['jobs']);
+```
+#### jQuery的proxy
+```javascript
+$.proxy = function(o,fn) {
+	return function() {
+		o[fn].call(o);	
+	};
+};
 ```

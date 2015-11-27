@@ -2,6 +2,7 @@
 var newTodo = $('#newTodo');
 var ul = $('ul.todos');
 var header = $('header');
+
 var addTodo = function(todo) {
 	ul.append("<li>" + todo + "</li>");
 };
@@ -18,3 +19,12 @@ newTodo.bind('keypress',function(e) {
 	addTodo(newTodo.val());
 	newTodo.val('');	
 });
+
+var ericsson = {
+	name:'ericsson',
+	show:function() {
+		console.log(this.name);
+	}
+};
+
+newTodo.bind('click',$.proxy(ericsson,'show'));
