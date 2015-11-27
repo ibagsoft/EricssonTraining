@@ -569,6 +569,157 @@ this.init.call(o2,'gates');
 	$.proxy = proxy;
 })(window);
 ```
+### 重用
+
+#### __proto__
+JS通过__proto__来完成复用的：
+```javascript
+var o1 = {
+	method:function() {}
+};
+var o2 = {
+	myMethod:function() {}
+};
+console.assert(typeof o2.method !== 'function');
+console.assert(typeof o2.myMethod === 'function');
+
+o2.__proto__ = o1;
+console.assert(typeof o2.method === 'function');
+console.assert(typeof o2.myMethod === 'function');
+```
+通过__proto__让封装函数更具有重用性:
+```javascript
+(function() {
+	//private
+	var prototype = {
+		say:function() {
+			console.log(this.name);
+		},
+		show:function() {}
+	}
+	var init = function(name) {
+		this.name = name;
+		this.__proto__ = prototype;
+	};
+
+	//public
+	this.init = init;
+}).call(this);
+
+var o1 = {};
+this.init.call(o1,'jobs');
+var o2 = {};
+this.init.call(o2,'gates');
+o1.say();
+o2.say();
+```
+可以直接指定对象的方法是专门给init重用的:
+```javascript
+(function() {
+	//private
+	var init = function(name) {
+		this.name = name;
+		this.__proto__ = init.prototype;
+		// this.__proto__.__proto__ = init.prototype;
+		// for(var attr in init.prototype){
+		// 	this.__proto__[attr] = init.prototype[attr];
+		// }
+	};
+	init.prototype = {
+		say:function() {
+			console.log(this.name);
+		},
+		show:function() {}
+	};
+	//public
+	this.init = init;
+}).call(this);
+```
+但是这么写太麻烦了，所以在后来的JS版本里，干脆就将prototype作为了关键字使用：
+
+#### prototype
+```javascript
+var Person = function(name) {
+	this.name = name;
+};
+Person.prototype = {
+	say:function() {
+		console.log(this.name);
+	},
+	show:function() {}
+};
+
+var jobs = new Person('jobs');
+```
+此时`var jobs = new Person('jobs');`相当于:
+```javascript
+var jobs = {};//var jobs = new Object();
+jobs.__proto__ = Person.prototype;//var jobs = new Person
+Person.call(jobs,'jobs');//Person('jobs')
+```
+
+#### __proto__ vs prototype
+```javascript
+var i = 5;
+var str = 'abc';
+var o = {name:'jobs'};
+var foo = function() {};
+
+console.log(i.__proto__);
+console.log(str.__proto__);
+console.log(o.__proto__);
+console.log(foo.__proto__);
+console.log('\n===========================\n');
+console.log(i.prototype);
+console.log(str.prototype);
+console.log(o.prototype);
+console.log(foo.prototype);
+```
+只有构造器的prototype才有价值:
+```javascript
+//相当于定义Person类的构造函数
+var Person = function(name) {
+	this.name = name;
+};
+/*console.log(Person.prototype);
+console.assert(Person === Person.prototype.constructor);*/
+//相当于声明Person类别的公共方法和属性
+Person.prototype = {
+	constructor:Person,
+	show:function() {},
+	say:function() {}
+};
+var jobs = new Person('jobs');
+```
+
+#### Sugar
+数字糖
+```javascript
+
+Number.prototype.after_seconds = function(callback) {
+	setTimeout(callback,1000*this);
+};
+
+var i = 5;
+i.after_seconds(function() {
+	console.log('close.');
+});
+```
+字符串糖:
+```javascript
+//定义
+String.prototype.render = function(selector) {
+  var el = $(selector);
+  var tmpl = $('#tmpl').html();
+  $.getJSON('/'+this,function(products) {
+    for (var index in products) {
+      el.append(Mustache.render(tmpl, products[index]));
+    }
+  });
+};
+//使用
+"products".render('div.row');
+```
 
 
 

@@ -1,15 +1,19 @@
 (function() {
 	//private
-	var say = function() {
-		console.log(this.name);
-	};
-	var show = function() {};
 	var init = function(name) {
 		this.name = name;
-		this.say = say;
-		this.show = show;
+		this.__proto__ = init.prototype;
+		// this.__proto__.__proto__ = init.prototype;
+		// for(var attr in init.prototype){
+		// 	this.__proto__[attr] = init.prototype[attr];
+		// }
 	};
-
+	init.prototype = {
+		say:function() {
+			console.log(this.name);
+		},
+		show:function() {}
+	};
 	//public
 	this.init = init;
 }).call(this);

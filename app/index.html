@@ -34,8 +34,20 @@
     </script>
     <script src="lib/jquery.js"></script>
     <script type="text/javascript" src='lib/mustache.js'></script>
-    <script type="text/javascript" src='js/jqlite.js'></script>
-    <script type="text/javascript" src='js/todos.js'></script>
+    <script type="text/javascript">
+      String.prototype.render = function(selector) {
+        var el = $(selector);
+        var tmpl = $('#tmpl').html();
+        $.getJSON('/'+this,function(products) {
+          for (var index in products) {
+            el.append(Mustache.render(tmpl, products[index]));
+          }
+        });
+      };
+    </script>
+    <script type="text/javascript">
+      "products".render('div.row');
+    </script>
   </body>
 </html>
 
