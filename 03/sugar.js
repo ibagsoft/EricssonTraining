@@ -1,15 +1,12 @@
 // sugar.js
-
-Number.prototype.after_seconds = function(callback) {
+/*Number.prototype.after_seconds = function(callback) {
 	setTimeout(callback,1000*this);
 };
 
 var i = 5;
 i.after_seconds(function() {
 	console.log('close.');
-});
-
-
+});*/
 
 /*//相当于定义Person类的构造函数
 var Person = function(name) {

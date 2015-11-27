@@ -720,6 +720,229 @@ String.prototype.render = function(selector) {
 //使用
 "products".render('div.row');
 ```
+插播一条广告:  
+- 单元测试:Mocha、Jasmine  
+- 代码检查:jsHint  
+- 持续交付:Grunt、Glup  
+- 自动生成:Yeoman  
+
+关于详细信息可以查看:`http://ibagsoft.github.io/js_dota/agile4js/`  
+
+函数的语法糖:
+```javascript
+//使用
+var Person = function(name) {
+	this.name = name;
+};
+Person
+.method('say',function() {})
+.method('show',function() {});
+var jobs = new Person('jobs');
+jobs.should.be.ok;
+jobs.should.have.properties('say','show');
+//定义
+Function.prototype.method = function(name,fn) {
+	this.prototype[name] = fn;
+	return this;
+};
+```
+
+#### jQuery的fn
+```javascript
+(function(window) {
+	//private
+	var val = function(content) {
+		if(typeof content === 'string')
+			this.el.value = content;
+		else
+			return this.el.value;
+	};
+	var bind = function(event,callback) {
+		this.el.addEventListener(event,callback);
+	};
+	var append = function(content) {
+		var reg = /^<(\w+)>(.*)<\/\1>/;
+		var match = reg.exec(content);
+		var li = document.createElement(match[1]);
+		li.innerText = match[2];
+		this.el.appendChild(li);
+	};
+	var getStyle =function(attr) {
+		var style = document.defaultView.getComputedStyle(this.el);
+		return style[attr];
+	};
+	var slideDown = function(during) {
+		var height = parseInt(this.getStyle('height'));
+		this.el.style.overflow = 'auto';
+		var that = this;
+		for(var i = 1;i<=height;i++){
+			(function(h) {
+				setTimeout(function() {
+					that.el.style.height = h + "px";
+				},h*during/height);
+			})(i);
+		}
+	};
+	var getJSON = function(url,data,success) {
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState === 4 && xhr.status === 200){
+				success(JSON.parse(xhr.responseText));
+			}
+		};
+		xhr.open('get',url,true);
+		xhr.send(null);
+	};
+	var proxy = function(o,fn) {
+		return function() {
+			o[fn].call(o);	
+		};
+	};
+	var jQuery = function(selector) {
+		return jQuery.fn.init(selector);
+	};
+	jQuery.fn = jQuery.prototype = {
+		constructor:jQuery,
+		init:function(selector) {
+			var el = document.querySelector(selector);
+			var o = Object.create(jQuery.fn);
+			o.el = el;
+			return o;
+		},
+		val:val,
+		bind:bind,
+		append:append,
+		getStyle:getStyle,
+		slideDown:slideDown
+	};
+	var $ = window.$ = jQuery;
+	$.getJSON = getJSON;
+	$.proxy = proxy;
+})(window);
+```
+这种写法非常节省内存。  
+而且这种写法可以为jQuery添加插件机制
+```javascript
+(function(window) {
+	//private
+	var val = function(content) {
+		if(typeof content === 'string')
+			this.el.value = content;
+		else
+			return this.el.value;
+	};
+	var bind = function(event,callback) {
+		this.el.addEventListener(event,callback);
+	};
+	var append = function(content) {
+		var reg = /^<(\w+)>(.*)<\/\1>/;
+		var match = reg.exec(content);
+		var li = document.createElement(match[1]);
+		li.innerText = match[2];
+		this.el.appendChild(li);
+	};
+	var getStyle =function(attr) {
+		var style = document.defaultView.getComputedStyle(this.el);
+		return style[attr];
+	};
+	var slideDown = function(during) {
+		var height = parseInt(this.getStyle('height'));
+		this.el.style.overflow = 'auto';
+		var that = this;
+		for(var i = 1;i<=height;i++){
+			(function(h) {
+				setTimeout(function() {
+					that.el.style.height = h + "px";
+				},h*during/height);
+			})(i);
+		}
+	};
+	var getJSON = function(url,data,success) {
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState === 4 && xhr.status === 200){
+				success(JSON.parse(xhr.responseText));
+			}
+		};
+		xhr.open('get',url,true);
+		xhr.send(null);
+	};
+	var proxy = function(o,fn) {
+		return function() {
+			o[fn].call(o);	
+		};
+	};
+	var jQuery = function(selector) {
+		return jQuery.fn.init(selector);
+	};
+	jQuery.fn = jQuery.prototype = {
+		constructor:jQuery,
+		init:function(selector) {
+			var el = document.querySelector(selector);
+			var o = Object.create(jQuery.fn);
+			o.el = el;
+			return o;
+		},
+		val:val,
+		bind:bind,
+		append:append,
+		getStyle:getStyle,
+		slideDown:slideDown
+	};
+	var $ = window.$ = window.jQuery = jQuery;
+	$.getJSON = getJSON;
+	$.proxy = proxy;
+})(window);
+```
+插件:
+```javascript
+;(function(jQuery) {
+	jQuery.fn.fly = function(during) {
+		var width = screen.width;
+		var el = this.el;
+		el.style['position'] = 'absolute';
+		el.style['left'] = '0px';
+		for(var i = 1;i<=width;i++){
+			(function(h) {
+				setTimeout(function() {
+					el.style.left = h + "px";
+				},h*during/width);
+			})(i);
+		}
+	};
+})(jQuery);
+```
+
+## ericsson的示例
+```javascript
+var ericsson = ericsson || {};
+var model = ericsson.Model = function() {};
+model.prototype = {
+	save:function() {},
+	fetch:function() {},
+	ajax:function() {},
+	toJSON:function() {}
+}
+var view = ericsson.View = function() {};
+view.prototype = {
+	render:function() {},
+	events:function() {}
+};
+var extend = model.extend = view.extend = function(options) {
+	var child = function() {};
+	child.prototype.__proto__ = this.prototype;
+	for(var attr in options){
+		child.prototype[attr] = options[attr];
+	}
+	return child;
+};
+```
+
+## One more things
+
+- http://ibagsoft.github.io/js_dota/adobe/  
+- https://github.com/ibagsoft/Green_Tea
+
 
 
 

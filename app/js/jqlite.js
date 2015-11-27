@@ -48,18 +48,23 @@
 		};
 	};
 	var jQuery = function(selector) {
-		var el = document.querySelector(selector);
-		var o = {
-			el:el,
-			val:val,
-			bind:bind,
-			append:append,
-			getStyle:getStyle,
-			slideDown:slideDown
-		};
-		return o;
+		return jQuery.fn.init(selector);
 	};
-	var $ = window.$ = jQuery;
+	jQuery.fn = jQuery.prototype = {
+		constructor:jQuery,
+		init:function(selector) {
+			var el = document.querySelector(selector);
+			var o = Object.create(jQuery.fn);
+			o.el = el;
+			return o;
+		},
+		val:val,
+		bind:bind,
+		append:append,
+		getStyle:getStyle,
+		slideDown:slideDown
+	};
+	var $ = window.$ = window.jQuery = jQuery;
 	$.getJSON = getJSON;
 	$.proxy = proxy;
 })(window);
